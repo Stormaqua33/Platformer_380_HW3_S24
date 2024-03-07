@@ -5,11 +5,13 @@ import { GameEventType } from "../../Wolfie2D/Events/GameEventType";
 import Input from "../../Wolfie2D/Input/Input";
 import { TweenableProperties } from "../../Wolfie2D/Nodes/GameNode";
 import { GraphicType } from "../../Wolfie2D/Nodes/Graphics/GraphicTypes";
+import Particle from "../../Wolfie2D/Nodes/Graphics/Particle";
 import Point from "../../Wolfie2D/Nodes/Graphics/Point";
 import Rect from "../../Wolfie2D/Nodes/Graphics/Rect";
 import AnimatedSprite from "../../Wolfie2D/Nodes/Sprites/AnimatedSprite";
 import Label from "../../Wolfie2D/Nodes/UIElements/Label";
 import { UIElementType } from "../../Wolfie2D/Nodes/UIElements/UIElementTypes";
+import ParticleSystem from "../../Wolfie2D/Rendering/Animations/ParticleSystem";
 import Scene from "../../Wolfie2D/Scene/Scene";
 import Timer from "../../Wolfie2D/Timing/Timer";
 import Color from "../../Wolfie2D/Utils/Color";
@@ -53,6 +55,9 @@ export default class GameLevel extends Scene {
 
     // Cooldown timer for changing suits
     protected suitChangeTimer: Timer;
+
+    // Cooldown timer for popping balloons
+    protected balloonPopTimer: Timer;
 
     // Total ballons and amount currently popped
     protected totalBalloons: number;
@@ -386,7 +391,10 @@ export default class GameLevel extends Scene {
         balloon.addPhysics();
         balloon.addAI(BalloonController, aiOptions);
         balloon.setGroup("balloon");
+        // Implemented trigger
+        balloon.setTrigger("balloon", HW5_Events.PLAYER_HIT_BALLOON, null);
 
+        balloon.setTrigger("balloon", HW5_Events.BALLOON_POPPED, null);
     }
 
     // HOMEWORK 5 - TODO
@@ -416,8 +424,33 @@ export default class GameLevel extends Scene {
      * 
      */
     protected handlePlayerBalloonCollision(player: AnimatedSprite, balloon: AnimatedSprite) {
+        // Half a second cooldown between popping balloons
+        this.balloonPopTimer = new Timer(500);
+        if (!(this.balloonPopTimer.isStopped)){
+            return;
+        }
+        // Check if damage is done to player
+        const balloonController = balloon['ai'] as BalloonController;
+        const playerController = player['ai'] as PlayerController;
+        if (balloonController.color != playerController.suitColor){
+            this.incPlayerLife(-1);
+        }
+        // Change Particle System to color of balloon
+        if (balloonController.color == HW5_Color.RED){
+            this.system.changeColor(Color.RED);
+        }
+        else if (balloonController.color == HW5_Color.GREEN){
+            this.system.changeColor(Color.GREEN);
+        }
+        else{
+            this.system.changeColor(Color.BLUE);
+        }
+        // Code for balloon pop - Check about holdReference
+        this.emitter.fireEvent(HW5_Events.BALLOON_POPPED, {key: "BalloonPopped", loop:false, holdReference: false});
+        this.emitter.fireEvent(GameEventType.PLAY_SOUND, {key: "balloon_pop", loop: false, holdReference:false});
+        
     }
-
+        
     /**
      * Increments the amount of life the player has
      * @param amt The amount to add to the player life

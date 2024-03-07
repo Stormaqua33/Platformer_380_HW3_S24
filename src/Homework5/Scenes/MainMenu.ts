@@ -13,7 +13,7 @@ export default class MainMenu extends Scene {
 
     loadScene(): void {
         // Load the menu song
-        this.load.audio("menu", "hw5_assets/music/menu.mp3");
+        this.load.audio("menu", "hw5_assets/music/CSE_380_HW3_Music.mp3");
     }
 
     startScene(): void {

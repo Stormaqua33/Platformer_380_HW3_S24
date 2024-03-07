@@ -4,6 +4,7 @@ import Debug from "../../Wolfie2D/Debug/Debug";
 import GameNode, { TweenableProperties } from "../../Wolfie2D/Nodes/GameNode";
 import Sprite from "../../Wolfie2D/Nodes/Sprites/Sprite";
 import OrthogonalTilemap from "../../Wolfie2D/Nodes/Tilemaps/OrthogonalTilemap";
+import Timer from "../../Wolfie2D/Timing/Timer";
 import { EaseFunctionType } from "../../Wolfie2D/Utils/EaseFunctions";
 import { HW5_Color } from "../hw5_color";
 import { HW5_Events } from "../hw5_enums";
@@ -36,6 +37,7 @@ export default class PlayerController extends StateMachineAI {
     MAX_SPEED: number = 300;
     tilemap: OrthogonalTilemap;
     suitColor: HW5_Color;
+    dyingAnimationTimer: Timer;
 
     // HOMEWORK 5 - TODO
     /**
@@ -70,6 +72,12 @@ export default class PlayerController extends StateMachineAI {
                 }
             ]
         });
+        // Play the death animation of flip, and loop it - Essentially keep rotation
+        owner.tweens.play("flip", true);
+        dyingAnimationTimer = new Timer(3000);
+
+
+        // Implement
 
     }
 
@@ -125,5 +133,9 @@ export default class PlayerController extends StateMachineAI {
 		} else if(this.currentState instanceof Fall){
             Debug.log("playerstate", "Player State: Fall");
         }
+
+        // Check if on tile over switch
+        // If so, change sound, change to ON sprite, send PLAYER_HIT_SWITCH event
+
 	}
 }
