@@ -40,6 +40,7 @@ export default class Level1 extends GameLevel {
      */
     unloadScene(){
         // Keep resources - this is up to you
+        // Resources already removed/unloaded in level2.ts
     }
 
     startScene(): void {

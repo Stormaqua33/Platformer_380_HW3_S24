@@ -1,6 +1,11 @@
 import Vec2 from "../../Wolfie2D/DataTypes/Vec2";
+import EventQueue from "../../Wolfie2D/Events/EventQueue";
 import GameEvent from "../../Wolfie2D/Events/GameEvent";
+import GameNode from "../../Wolfie2D/Nodes/GameNode";
 import AnimatedSprite from "../../Wolfie2D/Nodes/Sprites/AnimatedSprite";
+import PlayerController from "../Player/PlayerController";
+import PlayerState from "../Player/PlayerStates/PlayerState";
+import GameLevel from "../Scenes/GameLevel";
 import { HW5_Events } from "../hw5_enums";
 import BalloonState from "./BalloonState";
 
@@ -22,9 +27,28 @@ import BalloonState from "./BalloonState";
  */
 export default class ZeroGravity extends BalloonState {
 	onEnter(): void {
+		this.gravity = 0;
+	}
+
+	update(deltaT: number): void{
+		// Get player position
+		// Unsure how to do so
+		let player_pos = this.parent.owner.relativePosition;
+		let px = player_pos.x;
+		let py = player_pos.y;
+		// Get distance between balloon and player
+		let distance = Math.sqrt(Math.pow(this.owner.positionX - px, 2) + Math.pow(this.owner.positionY - py, 2));
+		let current_distance_state = 1;				// 1 is if within 10 tiles; 0 is if outside of ten tiles range
+		if (distance <= 10 && current_distance_state == 0){			// If has reached within ten tiles range
+			this.parent.velocity.x = 2 * this.parent.velocity.x;	// Double x velocity
+		}
+		if (distance > 10 && current_distance_state == 1){			// If has reached beyond 10 tile range
+			this.parent.velocity.x = 0.5 * this.parent.velocity.x;	// Half the x velocity back to normal
+		}
 	}
 
 	onExit(): Record<string, any> {
+		this.gravity = 500;
 		return {};
 	}
 }

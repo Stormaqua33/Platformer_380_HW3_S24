@@ -29,6 +29,7 @@ export enum PlayerStates {
 	PREVIOUS = "previous"
 }
 
+
 export default class PlayerController extends StateMachineAI {
     protected owner: GameNode;
     velocity: Vec2 = Vec2.ZERO;
@@ -37,7 +38,6 @@ export default class PlayerController extends StateMachineAI {
     MAX_SPEED: number = 300;
     tilemap: OrthogonalTilemap;
     suitColor: HW5_Color;
-    dyingAnimationTimer: Timer;
 
     // HOMEWORK 5 - TODO
     /**
@@ -74,9 +74,14 @@ export default class PlayerController extends StateMachineAI {
         });
         // Play the death animation of flip, and loop it - Essentially keep rotation
         owner.tweens.play("flip", true);
-        dyingAnimationTimer = new Timer(3000);
-
-
+        let dyingAnimationTimer = new Timer(3000);  // Play animation for 3 seconds - 6 rotations
+        // While playing the animation, fade alpha.
+        while (!(dyingAnimationTimer.isStopped) || owner.alpha > 0){ // While not stopped
+            if (owner.alpha != 0){
+                owner.alpha = owner.alpha - 1/9000;
+            }
+        } 
+        owner.tweens.stop("flip");      
         // Implement
 
     }
@@ -135,6 +140,7 @@ export default class PlayerController extends StateMachineAI {
         }
 
         // Check if on tile over switch
+        
         // If so, change sound, change to ON sprite, send PLAYER_HIT_SWITCH event
 
 	}

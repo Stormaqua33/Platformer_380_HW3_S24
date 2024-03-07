@@ -476,4 +476,12 @@ export default class GameLevel extends Scene {
         Input.enableInput();
         this.system.stopSystem();
     }
+
+    getPlayerCoordX(): number{
+        return this.player.positionX;
+    }
+
+    getPlayerCoordY(): number{
+        return this.player.positionX;
+    }
 }
